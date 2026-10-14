@@ -11,4 +11,5 @@ func main() {
 	flag.Parse()
 
 	internal.Selector(cname)
+	internal.FamilyStats(cname)
 }
