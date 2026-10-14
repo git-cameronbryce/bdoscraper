@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"regexp"
 
 	"github.com/go-rod/rod"
 )
@@ -11,9 +10,9 @@ type Adventurer struct {
 	Region string
 	Guild  string
 	Title  string
+	Class  string
 	Level  string
 	User   string
-	Type   string
 }
 
 func Selector(cname *string) {
@@ -21,7 +20,9 @@ func Selector(cname *string) {
 		"region": "#wrap > div > div.container.adventure > article > div > div > div.box_list_area > ul > li > div.region",
 		"guild":  "#wrap > div > div.container.adventure > article > div > div > div.box_list_area > ul > li > div.state",
 		"title":  "#wrap > div > div.container.adventure > article > div > div > div.box_list_area > ul > li > div.title",
-		"user":   "#wrap > div > div.container.adventure > article > div > div > div.box_list_area > ul > li > div.user",
+		"class":  "#wrap > div > div.container.adventure > article > div > div > div.box_list_area > ul > li > div.user > div > span.character_class > span.name",
+		"level":  "#wrap > div > div.container.adventure > article > div > div > div.box_list_area > ul > li > div.user > div > span.character_desc > span.text_area > span.level",
+		"user":   "#wrap > div > div.container.adventure > article > div > div > div.box_list_area > ul > li > div.user > div > span.character_desc > span.text_area > span.text",
 	}
 
 	browser := rod.New().MustConnect().NoDefaultDevice()
@@ -33,27 +34,23 @@ func Selector(cname *string) {
 	)
 
 	page := browser.MustPage(url).MustWindowFullscreen()
-	text := page.MustElement(selectors["user"]).MustText()
-
-	pattern := regexp.MustCompile(`^(Lv\.\d+)(.+)\n(\w+)$`)
-	matches := pattern.FindStringSubmatch(text)
 
 	adventurer := Adventurer{
 		Region: page.MustElement(selectors["region"]).MustText(),
 		Guild:  page.MustElement(selectors["guild"]).MustText(),
 		Title:  page.MustElement(selectors["title"]).MustText(),
-		Level:  matches[1],
-		User:   matches[2],
-		Type:   matches[3],
+		Class:  page.MustElement(selectors["class"]).MustText(),
+		Level:  page.MustElement(selectors["level"]).MustText(),
+		User:   page.MustElement(selectors["user"]).MustText(),
 	}
 
 	fmt.Printf(
-		"Region: %s, Guild: %s, Title: %s, Level: %s, User: %s, Type: %s\n",
+		"Region: %s, Guild: %s, Title: %s, Class: %s, Level: %s, User: %s\n",
 		adventurer.Region,
 		adventurer.Guild,
 		adventurer.Title,
+		adventurer.Class,
 		adventurer.Level,
 		adventurer.User,
-		adventurer.Type,
 	)
 }
